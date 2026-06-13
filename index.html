@@ -1,0 +1,327 @@
+<!--
+================================================================================
+NeoDaily Hero - Scroll-driven Video Scrubbing
+================================================================================
+
+INSTRUÇÕES DE SETUP (Abordagem A - Canvas + Sequência de Frames - PREFERIDA):
+
+1. Extraia os frames do vídeo para garantir o melhor desempenho sem travamentos (padrão Apple).
+   Abra o terminal na pasta onde está o arquivo de vídeo e execute:
+   
+   mkdir -p assets/frames
+   ffmpeg -i "assets/raw_files/video.mp4" -vf "fps=30,scale=1920:-2" -q:v 4 assets/frames/frame_%04d.jpg
+
+2. Verifique quantos frames foram gerados na pasta assets/frames.
+   Vá até o final deste arquivo e ajuste a variável `frameCount` para o número exato de imagens.
+
+CDNs Utilizados:
+- Tailwind CSS via CDN (para layout ágil e responsivo, adaptado ao Design System)
+- Google Fonts (Inter)
+- GSAP 3.12.5 + ScrollTrigger (Animações e Scrubbing)
+- Lenis (Smooth scroll fluido)
+- SplitType (Animação avançada de tipografia no Reveal)
+- Iconify (Ícones)
+
+================================================================================
+-->
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NeoDaily - O seu WhatsApp resumido em podcast</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- CDNs -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/split-type"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.39/dist/lenis.min.js"></script>
+
+    <script>
+        // Tailwind Configuration - Matching Design System Tokens
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        stone: {
+                            200: '#EAEAE5',
+                            300: '#C2C2C2', // Helper
+                            400: '#999999', // Helper
+                            500: '#6B6B6B',
+                            900: '#1C1C1C'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --bg-main: #FFFFFF;
+            --bg-alt: #F9F9F8;
+            --text-primary: #1C1C1C;
+            --text-secondary: #6B6B6B;
+            --stone-900: #1C1C1C;
+            --stone-200: #EAEAE5;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Lenis smooth scroll fix */
+        html.lenis { height: auto; }
+        .lenis.lenis-smooth { scroll-behavior: auto; }
+        .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+        .lenis.lenis-stopped { overflow: hidden; }
+        .lenis.lenis-scrolling iframe { pointer-events: none; }
+
+        /* Custom Micro-interactions & Design System Effects */
+        .glass-panel {
+            background: rgba(28, 28, 28, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .beam-button {
+            position: relative;
+            overflow: hidden;
+        }
+        .beam-button::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(28, 28, 28, 0.15), transparent);
+            transition: left 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1;
+        }
+        .beam-button:hover::before { left: 100%; }
+
+        .glow-on-hover { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .glow-on-hover:hover {
+            box-shadow: 0 10px 40px rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+        }
+
+        /* SplitType Line hiding for clean reveals */
+        .line { overflow: hidden; }
+        
+        /* Will-change para performance de animação */
+        .will-change-transform { will-change: transform, opacity; }
+        #video-canvas { will-change: transform; }
+        
+        /* Fallback de motion */
+        @media (prefers-reduced-motion: reduce) {
+            .scroll-indicator { display: none; }
+            .beam-button::before { display: none; }
+            * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; scroll-behavior: auto !important; }
+        }
+    </style>
+</head>
+<body class="selection:bg-white selection:text-stone-900">
+
+    <!-- HERO SECTION - PINNED CONTAINER -->
+    <!-- Define a altura do scroll. 400vh significa 4x a altura da tela para o tempo de scrub total do vídeo -->
+    <div id="hero-scroll-container" class="relative w-full h-[400vh] bg-stone-900">
+        
+        <!-- STICKY WRAPPER: Fica preso na tela durante o scroll -->
+        <div class="hero-sticky sticky top-0 w-full h-screen overflow-hidden flex flex-col justify-end items-center pb-32">
+            
+            <!-- Usando a tag de vídeo diretamente para o arquivo solicitado -->
+            <video id="scrub-video" class="absolute inset-0 w-full h-full object-cover z-0" muted playsinline preload="auto">
+                <source src="assets/raw_files/video.mp4" type="video/mp4">
+            </video>
+
+            <!-- Overlay focado apenas na parte inferior para que o vídeo brilhe no centro e no topo -->
+            <div class="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-stone-900 via-stone-900/60 to-transparent z-10 pointer-events-none"></div>
+
+            <!-- HERO CONTENT LAYER -->
+            <div id="hero-content" class="relative z-20 w-full max-w-[1400px] mx-auto px-6 flex flex-col items-center text-center will-change-transform">
+                
+                <!-- Badge -->
+                <div class="badge-reveal inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel text-xs font-mono uppercase tracking-widest text-stone-200 mb-6 opacity-0 translate-y-4">
+                    <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                    Novo formato
+                </div>
+
+                <!-- Headline -->
+                <h1 class="headline text-4xl md:text-6xl lg:text-[5rem] font-semibold tracking-tighter leading-[1.05] text-white mb-4 max-w-4xl">
+                    <span class="text-[#25D366]">Seu grupo de WhatsApp,</span><br/>
+                    <span class="text-white">resumido em um podcast.</span>
+                </h1>
+                
+                <!-- Subheadline -->
+                <p class="subheadline text-base md:text-lg text-white/90 max-w-2xl leading-relaxed mb-8 opacity-0">
+                    Você não precisa ler centenas de mensagens acumuladas. Ouça o resumo do dia em poucos minutos e fique por dentro do que realmente importa.
+                </p>
+
+                <!-- CTAs -->
+                <div class="cta-wrapper flex flex-col sm:flex-row items-center gap-6 opacity-0">
+                    <!-- Botão Primário -->
+                    <button class="beam-button px-8 py-4 bg-white text-stone-900 rounded-full text-sm font-bold flex items-center justify-center gap-3 glow-on-hover w-full sm:w-auto shadow-xl">
+                        Assinar o NeoDaily
+                        <iconify-icon icon="solar:headphones-round-sound-bold-duotone" class="text-xl"></iconify-icon>
+                    </button>
+                    
+                    <!-- Botão Secundário -->
+                    <a href="#como-funciona" class="px-8 py-4 bg-transparent border border-white/20 text-white rounded-full text-sm font-medium hover:bg-white/10 transition-colors duration-300 flex items-center justify-center gap-2 w-full sm:w-auto glass-panel">
+                        Ouvir episódio de teste
+                        <iconify-icon icon="solar:play-circle-linear" class="text-xl"></iconify-icon>
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Scroll Indicator -->
+            <div class="scroll-indicator absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20">
+                <span class="text-[10px] font-mono uppercase tracking-widest text-stone-400">Role para explorar</span>
+                <iconify-icon icon="solar:mouse-circle-linear" class="text-xl text-stone-400 animate-bounce"></iconify-icon>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Próxima seção fantasma apenas para permitir que o scroll passe da Hero suavemente -->
+    <div class="h-screen bg-white flex items-center justify-center relative z-30">
+        <div class="text-center">
+            <h2 class="text-3xl font-medium text-stone-900 mb-4">O conteúdo do site continuaria aqui.</h2>
+            <p class="text-stone-500">A seção hero destravou o pin.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // ==========================================
+            // 1. Setup Smooth Scrolling (Lenis)
+            // ==========================================
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            
+            let lenis;
+            if (!prefersReducedMotion) {
+                lenis = new Lenis({
+                    duration: 1.2,
+                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Curva suave
+                    direction: 'vertical',
+                    gestureDirection: 'vertical',
+                    smooth: true,
+                    mouseMultiplier: 1,
+                    smoothTouch: false,
+                    touchMultiplier: 2,
+                    infinite: false,
+                });
+
+                function raf(time) {
+                    lenis.raf(time);
+                    requestAnimationFrame(raf);
+                }
+                requestAnimationFrame(raf);
+
+                // Integração do Lenis com ScrollTrigger
+                lenis.on('scroll', ScrollTrigger.update);
+                gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+                gsap.ticker.lagSmoothing(0, 0);
+            }
+
+            // ==========================================
+            // 2. Animação de Entrada (Reveal)
+            // ==========================================
+            const splitHeadline = new SplitType('.headline', { types: 'lines, words' });
+            
+            const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+            // Badge fade in
+            tl.to('.badge-reveal', { opacity: 1, y: 0, duration: 1, delay: 0.2 })
+            // Words staggared reveal (fazendo "mask" visual com overflow hidden nas linhas)
+            .from(splitHeadline.words, {
+                y: "120%",
+                opacity: 0,
+                duration: 1.2,
+                stagger: 0.04,
+                ease: "expo.out"
+            }, "-=0.6")
+            // Subheadline fade in
+            .to('.subheadline', { opacity: 1, y: 0, duration: 1 }, "-=0.8")
+            // CTA Buttons
+            .to('.cta-wrapper', { opacity: 1, y: 0, duration: 1 }, "-=0.8");
+
+
+            // ==========================================
+            // 3. Efeito Parallax/Fade do Conteúdo no Scroll
+            // ==========================================
+            // Faz o texto sumir e subir lentamente quando o usuário começa a rolar
+            gsap.to('#hero-content', {
+                scrollTrigger: {
+                    trigger: "#hero-scroll-container",
+                    start: "top top",
+                    end: "+=150%", // Fades out completely when scrolled 150% of viewport
+                    scrub: true,
+                },
+                opacity: 0,
+                y: -150,
+                scale: 0.95,
+                ease: "none"
+            });
+            
+            // Oculta o scroll indicator no primeiro movimento
+            gsap.to('.scroll-indicator', {
+                scrollTrigger: {
+                    trigger: "#hero-scroll-container",
+                    start: "top top",
+                    end: "+=200",
+                    scrub: true,
+                },
+                opacity: 0,
+                ease: "none"
+            });
+
+            // ==========================================
+            // 4. Vídeo Scrubbing (Tag Native Video)
+            // ==========================================
+            const video = document.getElementById('scrub-video');
+            if(video && !prefersReducedMotion) {
+                // Garante que o vídeo vai conseguir reproduzir o currentTime rapidamente
+                video.addEventListener('loadedmetadata', function() {
+                    video.pause();
+                });
+                
+                // Mapeia o progresso do scroll pro tempo do vídeo
+                ScrollTrigger.create({
+                    trigger: "#hero-scroll-container",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 0.1, // leve suavização
+                    onUpdate: (self) => {
+                        // self.progress vai de 0 a 1
+                        if(video.readyState >= 1 && video.duration) {
+                            try {
+                                video.currentTime = video.duration * self.progress;
+                            } catch(e) {}
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
