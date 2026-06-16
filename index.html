@@ -129,6 +129,65 @@ CDNs Utilizados:
         .will-change-transform { will-change: transform, opacity; }
         #video-canvas { will-change: transform; }
         
+        /* Grid Background Dark */
+        .grid-bg-dark {
+            background-color: #0a0a0a;
+            background-size: 40px 40px;
+            background-image:
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+
+        /* Ocultar marca d'água do sistema (Gemini) se injetada no DOM */
+        [id*="gemini"], [class*="gemini"], [id*="watermark"], [class*="watermark"] {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            z-index: -1 !important;
+        }
+
+        /* Scroll Reveal para seções */
+        .reveal-section {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-section.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .delay-200 { transition-delay: 0.2s; }
+        .delay-400 { transition-delay: 0.4s; }
+        
+        /* Custom Audio Range Slider */
+        .custom-range {
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .custom-range:focus { outline: none; }
+        .custom-range::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            border-radius: 9999px;
+            background: transparent;
+        }
+        .custom-range::-webkit-slider-thumb {
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            background: #25D366;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -5px;
+            box-shadow: 0 0 10px rgba(37, 211, 102, 0.5);
+            transition: transform 0.1s;
+        }
+        .custom-range::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
         /* Fallback de motion */
         @media (prefers-reduced-motion: reduce) {
             .scroll-indicator { display: none; }
@@ -137,29 +196,30 @@ CDNs Utilizados:
         }
     </style>
 </head>
-<body class="selection:bg-white selection:text-stone-900">
+<body class="selection:bg-white selection:text-stone-900 bg-stone-900 text-white">
 
     <!-- HERO SECTION - PINNED CONTAINER -->
     <!-- Define a altura do scroll. 400vh significa 4x a altura da tela para o tempo de scrub total do vídeo -->
-    <div id="hero-scroll-container" class="relative w-full h-[400vh] bg-stone-900">
+    <!-- HERO SECTION & BENEFÍCIOS - PINNED CONTAINER SCROLL SEQUENCE -->
+    <div id="hero-scroll-container" class="relative w-full bg-stone-900">
         
-        <!-- STICKY WRAPPER: Fica preso na tela durante o scroll -->
-        <div class="hero-sticky sticky top-0 w-full h-screen overflow-hidden flex flex-col justify-center bg-stone-900">
+        <!-- STICKY WRAPPER: Fica preso na tela durante toda a sequência -->
+        <div class="hero-sticky sticky top-0 w-full h-screen overflow-hidden flex flex-col justify-center bg-stone-900 grid-bg-dark">
 
-            <!-- Tag de vídeo em FULLSCREEN. Com zoom (scale), translação para a direita e âncora inferior (origin) para não cortar o logo -->
+            <!-- Tag de vídeo em FULLSCREEN -->
             <video id="scrub-video" class="absolute inset-0 w-full h-full object-cover object-[15%_center] md:object-center md:scale-[1.25] md:translate-x-[12.5%] md:origin-[center_80%] z-0" muted playsinline preload="auto">
                 <source src="assets/raw_files/video.mp4" type="video/mp4">
             </video>
 
-            <!-- Overlay em degradê horizontal: escuro na esquerda para o texto, transparente na direita para destacar o vídeo -->
-            <div class="absolute inset-0 bg-gradient-to-r from-stone-900 via-stone-900/60 to-transparent z-10 pointer-events-none"></div>
+            <!-- Overlay da Hero (Escuro na esquerda) -->
+            <div id="video-overlay-left" class="absolute inset-0 bg-gradient-to-r from-stone-900 via-stone-900/60 to-transparent z-10 pointer-events-none"></div>
+            
+            <!-- Overlay da Segunda Dobra (Escuro na direita, começa invisível) -->
+            <div id="video-overlay-right" class="absolute inset-0 bg-gradient-to-l from-stone-900 via-stone-900/90 to-transparent z-10 pointer-events-none opacity-0"></div>
 
-            <!-- HERO CONTENT LAYER -->
-            <div id="hero-content" class="relative z-20 w-full max-w-[1400px] mx-auto px-6 will-change-transform mt-20">
-                
-                <!-- O container de texto ocupa o lado esquerdo -->
+            <!-- HERO CONTENT LAYER (Left) -->
+            <div id="hero-content" class="absolute inset-0 z-20 w-full max-w-[1400px] mx-auto px-6 flex flex-col justify-center will-change-transform mt-20">
                 <div class="max-w-2xl flex flex-col items-start text-left">
-                    
                     <!-- Badge -->
                     <div class="badge-reveal inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel text-xs font-mono uppercase tracking-widest text-stone-200 mb-8 opacity-0 translate-y-4">
                         <span class="w-2 h-2 rounded-full bg-[#25D366] animate-pulse"></span>
@@ -179,20 +239,16 @@ CDNs Utilizados:
 
                     <!-- CTAs -->
                     <div class="cta-wrapper flex flex-col sm:flex-row items-center gap-4 opacity-0 w-full sm:w-auto">
-                        <!-- Botão Primário -->
-                        <button class="beam-button px-8 py-4 bg-white text-stone-900 rounded-full text-sm font-bold flex items-center justify-center gap-3 glow-on-hover shadow-xl w-full sm:w-auto">
+                        <a href="https://pay.kirvano.com/d884edbf-6437-4fa2-b02f-a7123f98fc42" target="_blank" class="beam-button px-8 py-4 bg-white text-stone-900 rounded-full text-sm font-bold flex items-center justify-center gap-3 glow-on-hover shadow-xl w-full sm:w-auto pointer-events-auto relative z-50">
                             Assinar o NeoDaily
                             <iconify-icon icon="solar:headphones-round-sound-bold-duotone" class="text-xl"></iconify-icon>
-                        </button>
-                        
-                        <!-- Botão Secundário -->
-                        <a href="#como-funciona" class="px-8 py-4 bg-transparent border border-white/20 text-white rounded-full text-sm font-medium hover:bg-white/10 transition-colors duration-300 flex items-center justify-center gap-2 glass-panel w-full sm:w-auto">
+                        </a>
+                        <a href="#beneficios-content" onclick="if(window.lenis) { window.lenis.scrollTo('#beneficios-content'); return false; }" class="px-8 py-4 bg-transparent border border-white/20 text-white rounded-full text-sm font-medium hover:bg-white/10 transition-colors duration-300 flex items-center justify-center gap-2 glass-panel w-full sm:w-auto pointer-events-auto relative z-50">
                             Ouvir episódio
                             <iconify-icon icon="solar:play-circle-linear" class="text-xl"></iconify-icon>
                         </a>
                     </div>
                 </div>
-
             </div>
 
             <!-- Scroll Indicator -->
@@ -201,16 +257,302 @@ CDNs Utilizados:
                 <iconify-icon icon="solar:mouse-circle-linear" class="text-xl text-stone-400 animate-bounce"></iconify-icon>
             </div>
 
+            <!-- 3a DOBRA: Comentários (Fixo no sticky, aparece com fade-in gradual) -->
+            <div id="comentarios-content" class="absolute inset-0 z-30 w-full max-w-[1400px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-16 items-center pointer-events-none opacity-0 invisible translate-y-8">
+                <!-- Coluna Esquerda: Textos e Comentários -->
+                <div id="comentarios-text-wrapper" class="col-span-1 lg:col-span-6 flex flex-col justify-center pointer-events-auto pb-10">
+                    <!-- Header -->
+                    <div class="mb-0 reveal-section">
+                        <h2 class="text-3xl md:text-4xl font-medium tracking-tight mb-2 text-white">
+                            Aprovação de quem<br/> <span class="text-[#25D366]">já não vive sem.</span>
+                        </h2>
+                        <p class="text-base text-white/80 leading-relaxed max-w-sm">
+                            Veja o que os membros dos grupos estão falando após os primeiros dias recebendo o NeoDaily.
+                        </p>
+                    </div>
+
+                    <!-- Carousel de Comentários -->
+                    <div class="relative w-full max-w-[380px] mt-2 group reveal-section delay-300">
+                        <div class="relative rounded-[2rem] p-3 bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-tr before:from-[#25D366]/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-700 perspective-[1000px]">
+                            <div id="comments-track" class="flex transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] relative z-10">
+                                <div class="w-full flex-shrink-0 px-2 flex items-center justify-center">
+                                    <img src="assets/raw_files/comentario01.png" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
+                                </div>
+                                <div class="w-full flex-shrink-0 px-2 flex items-center justify-center">
+                                    <img src="assets/raw_files/comentario02.png" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
+                                </div>
+                                <div class="w-full flex-shrink-0 px-2 flex items-center justify-center">
+                                    <img src="assets/raw_files/comentario03.png" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
+                                </div>
+                                <div class="w-full flex-shrink-0 px-2 flex items-center justify-center">
+                                    <img src="assets/raw_files/comentario04.png" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
+                                </div>
+                                <div class="w-full flex-shrink-0 px-2 flex items-center justify-center">
+                                    <img src="assets/raw_files/comentario05.png" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
+                                </div>
+                                <div class="w-full flex-shrink-0 px-2 flex items-center justify-center">
+                                    <img src="assets/raw_files/comentario06.png" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Controls -->
+                        <button id="prev-comment" class="absolute -left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-stone-900 border border-white/10 flex items-center justify-center text-white shadow-xl hover:bg-[#25D366] hover:text-stone-900 hover:scale-110 hover:border-[#25D366] transition-all duration-300 z-20 pointer-events-auto">
+                            <iconify-icon icon="solar:alt-arrow-left-linear" class="text-2xl"></iconify-icon>
+                        </button>
+                        <button id="next-comment" class="absolute -right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-stone-900 border border-white/10 flex items-center justify-center text-white shadow-xl hover:bg-[#25D366] hover:text-stone-900 hover:scale-110 hover:border-[#25D366] transition-all duration-300 z-20 pointer-events-auto">
+                            <iconify-icon icon="solar:alt-arrow-right-linear" class="text-2xl"></iconify-icon>
+                        </button>
+
+                        <div id="carousel-indicators" class="flex justify-center gap-2 mt-6 pointer-events-auto"></div>
+                    </div>
+                </div>
+
+                <!-- Coluna Direita vazia -->
+                <div class="col-span-1 lg:col-span-6 hidden lg:block"></div>
+            </div>
+
         </div>
+
+        <!-- DOM FLOW ELEMENTS: Rolam naturalmente por cima do fundo fixo -->
+        
+        <!-- Espaço de rolagem para a Hero brilhar e começar o fade out -->
+        <div class="w-full h-[60vh]"></div>
+
+        <!-- CONTEÚDO DA SEGUNDA DOBRA (Sobe pela direita) -->
+        <div id="beneficios-content" class="relative z-30 w-full max-w-[1400px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-16 items-center pointer-events-none mt-16">
+            
+            <!-- Glow orb na 2a dobra -->
+            <div class="absolute top-1/2 right-0 -translate-y-1/2 w-[600px] h-[600px] bg-[#25D366]/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+            <!-- Coluna Esquerda vazia (deixa o microfone aparecer e interagir caso necessário) -->
+            <div class="col-span-1 lg:col-span-6 hidden lg:block"></div>
+
+            <!-- Coluna Direita (Textos). Pointer-events-auto reativa o clique/hover sobre os textos e botões -->
+            <div id="beneficios-text-wrapper" class="col-span-1 lg:col-span-6 flex flex-col justify-center pointer-events-auto pb-32">
+                
+                <!-- Header da 2a Dobra -->
+                <div class="mb-10 reveal-section">
+                    <h2 class="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-6">
+                        <span class="text-[#25D366]">A cura para a</span> <span class="text-white">ansiedade<br/> das mil mensagens.</span>
+                    </h2>
+                    <p class="text-lg text-white leading-relaxed">
+                        Nossa inteligência artificial analisa todo o tráfego do seu grupo: áudios longos, links soltos, debates paralelos e memes. O resultado é um roteiro coeso gravado em estúdio virtual, entregue diariamente para você.
+                    </p>
+                </div>
+
+                <!-- Audio Player -->
+                <div class="mb-8 reveal-section delay-200">
+                    <div class="glass-panel border border-white/10 rounded-full p-2 pr-6 flex items-center gap-4 max-w-md w-full shadow-2xl relative overflow-hidden">
+                        <!-- BG Glow -->
+                        <div class="absolute inset-0 bg-gradient-to-r from-[#25D366]/10 to-transparent opacity-50"></div>
+                        
+                        <!-- Audio Element -->
+                        <audio id="podcast-audio" src="assets/raw_files/neodaily_exemplo_podcast.mp3" preload="metadata"></audio>
+
+                        <!-- Play/Pause Button -->
+                        <button id="play-pause-btn" class="relative z-10 w-12 h-12 flex-shrink-0 rounded-full bg-[#25D366] text-stone-900 flex items-center justify-center shadow-[0_0_20px_rgba(37,211,102,0.3)] hover:scale-105 hover:shadow-[0_0_30px_rgba(37,211,102,0.5)] transition-all duration-300 cursor-pointer">
+                            <iconify-icon id="play-icon" icon="solar:play-bold" class="text-xl ml-1"></iconify-icon>
+                            <iconify-icon id="pause-icon" icon="solar:pause-bold" class="text-xl hidden"></iconify-icon>
+                        </button>
+
+                        <!-- Progress Section -->
+                        <div class="relative z-10 flex-grow flex flex-col justify-center">
+                            <!-- Custom Range Slider -->
+                            <input type="range" id="audio-progress" value="0" min="0" max="100" class="custom-range w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer">
+                            
+                            <!-- Times -->
+                            <div class="flex justify-between items-center mt-1.5 text-[10px] font-mono text-stone-400">
+                                <span id="current-time">0:00</span>
+                                <span id="total-time">0:00</span>
+                            </div>
+                        </div>
+
+                        <!-- Speed Toggle -->
+                        <button id="speed-btn" class="relative z-10 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-mono text-white hover:bg-white/20 hover:text-[#25D366] transition-colors duration-300 flex-shrink-0 w-[45px] text-center cursor-pointer">
+                            1x
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lista de Features -->
+                <div class="space-y-6">
+                    <!-- Item 1 -->
+                    <div class="flex gap-6 group cursor-default reveal-section delay-300">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-full border border-white/30 flex items-center justify-center text-xs font-mono text-white group-hover:border-[#25D366] group-hover:shadow-[0_0_15px_rgba(37,211,102,0.3)] transition-all duration-500">01</div>
+                        <div>
+                            <h4 class="text-xl font-semibold text-[#25D366] mb-3">Foco no Essencial</h4>
+                            <p class="text-base text-white leading-relaxed">
+                                O motor elimina trivialidades e repetições. Tenha um resumo cirúrgico focado nas decisões, notícias e debates mais críticos do grupo.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 2 -->
+                    <div class="flex gap-6 group cursor-default reveal-section delay-400">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-full border border-white/30 flex items-center justify-center text-xs font-mono text-white group-hover:border-[#25D366] group-hover:shadow-[0_0_15px_rgba(37,211,102,0.3)] transition-all duration-500">02</div>
+                        <div>
+                            <h4 class="text-xl font-semibold text-[#25D366] mb-3">Economia de Horas</h4>
+                            <p class="text-base text-white leading-relaxed">
+                                Substitua horas rolando a tela por um episódio de 5 minutos. Ouça no trânsito, na academia ou lavando a louça, recuperando seu tempo livre.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Item 3 -->
+                    <div class="flex gap-6 group cursor-default reveal-section delay-500">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-full border border-white/30 flex items-center justify-center text-xs font-mono text-white group-hover:border-[#25D366] group-hover:shadow-[0_0_15px_rgba(37,211,102,0.3)] transition-all duration-500">03</div>
+                        <div>
+                            <h4 class="text-xl font-semibold text-[#25D366] mb-3">Presença Inteligente</h4>
+                            <p class="text-base text-white leading-relaxed">
+                                Nunca fique de fora da conversa. Chegue nas reuniões ou rodas de amigos com total contexto, sem ter precisado sofrer no grupo o dia todo.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Spacer 3 (Distância de scroll para a 3a Dobra que agora está fixa no sticky) -->
+        <div class="w-full h-[80vh]"></div>
+
+        <!-- 4a DOBRA: Preços (Centro) -->
+        <div id="pricing-content" class="relative z-30 w-full max-w-[1400px] mx-auto px-6 flex flex-col items-center justify-start pt-16 pointer-events-none min-h-screen">
+            <!-- Título Pricing -->
+            <div class="mb-12 reveal-section text-center pointer-events-auto">
+                <span class="inline-block py-1.5 px-4 rounded-full bg-[#25D366]/10 border border-[#25D366]/20 text-[#25D366] text-xs font-mono uppercase tracking-widest mb-6">
+                    Teste Grátis por 3 dias
+                </span>
+                <h2 class="text-4xl md:text-5xl font-medium tracking-tight mb-4 text-white">
+                    Simples, transparente e <span class="text-[#25D366]">sem amarras.</span>
+                </h2>
+                <p class="text-lg text-white/80 leading-relaxed max-w-xl mx-auto">
+                    Não pedimos cartão de crédito no teste gratuito.
+                </p>
+            </div>
+
+            <!-- Pricing Cards (3 colunas) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl pointer-events-auto">
+                
+                <!-- Trimestral -->
+                <div class="glass-panel p-8 rounded-3xl border border-white/10 hover:border-[#25D366]/30 transition-all duration-300 relative group flex flex-col reveal-section delay-200">
+                    <h3 class="text-xl text-white font-medium mb-2">Trimestral</h3>
+                    <div class="flex items-baseline gap-1 mb-2">
+                        <span class="text-lg text-white/60">R$</span>
+                        <span class="text-4xl text-white font-bold tracking-tight">249</span>
+                        <span class="text-white/60">/mês</span>
+                    </div>
+                    <p class="text-xs text-white/40 font-mono mb-6 pb-6 border-b border-white/10">Faturado R$ 747 a cada 90 dias</p>
+                    
+                    <ul class="space-y-4 mb-8 flex-grow">
+                        <li class="flex items-start gap-3 text-sm text-white/80">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-[#25D366] text-lg flex-shrink-0 mt-0.5"></iconify-icon>
+                            <span>Podcast diário de 3-4 minutos</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-sm text-white/80">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-[#25D366] text-lg flex-shrink-0 mt-0.5"></iconify-icon>
+                            <span>1 grupo conectado</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-sm text-white/80">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-[#25D366] text-lg flex-shrink-0 mt-0.5"></iconify-icon>
+                            <span>Opt-out automatizado</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-sm text-white/80">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-[#25D366] text-lg flex-shrink-0 mt-0.5"></iconify-icon>
+                            <span>Suporte por Whatsapp</span>
+                        </li>
+                    </ul>
+                    <a href="https://pay.kirvano.com/d884edbf-6437-4fa2-b02f-a7123f98fc42" target="_blank" class="w-full py-4 rounded-xl bg-white/5 border border-white/10 text-white font-medium hover:bg-[#25D366] hover:text-stone-900 transition-colors duration-300 flex items-center justify-center pointer-events-auto">Começar Teste Grátis</a>
+                </div>
+
+                <!-- Semestral -->
+                <div class="glass-panel p-8 rounded-3xl border border-[#25D366]/50 shadow-[0_0_40px_rgba(37,211,102,0.15)] relative group flex flex-col reveal-section delay-300 transform md:-translate-y-4">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#25D366] text-stone-900 text-[10px] font-bold uppercase tracking-widest py-1.5 px-4 rounded-full">
+                        Mais Popular
+                    </div>
+                    <h3 class="text-xl text-[#25D366] font-medium mb-2">Semestral</h3>
+                    <div class="flex items-baseline gap-1 mb-2">
+                        <span class="text-lg text-[#25D366]/60">R$</span>
+                        <span class="text-4xl text-[#25D366] font-bold tracking-tight">224</span>
+                        <span class="text-[#25D366]/60">/mês</span>
+                    </div>
+                    <p class="text-xs text-white/40 font-mono mb-6 pb-6 border-b border-white/10">Faturado R$ 1.347 a cada 180 dias</p>
+                    
+                    <ul class="space-y-4 mb-8 flex-grow">
+                        <li class="flex items-start gap-3 text-sm text-white/80">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-[#25D366] text-lg flex-shrink-0 mt-0.5"></iconify-icon>
+                            <span>Tudo do plano trimestral</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-sm text-white/80">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-[#25D366] text-lg flex-shrink-0 mt-0.5"></iconify-icon>
+                            <span>Relatório mensal de engajamento</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-sm text-white/80">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-[#25D366] text-lg flex-shrink-0 mt-0.5"></iconify-icon>
+                            <span>Escolha entre 3 vozes premium</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-sm text-white/80">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-[#25D366] text-lg flex-shrink-0 mt-0.5"></iconify-icon>
+                            <span>Suporte prioritário por Whatsapp</span>
+                        </li>
+                    </ul>
+                    <a href="https://pay.kirvano.com/d884edbf-6437-4fa2-b02f-a7123f98fc42" target="_blank" class="w-full py-4 rounded-xl bg-[#25D366] border border-[#25D366] text-stone-900 font-bold hover:bg-[#1ebd5a] transition-colors duration-300 shadow-[0_0_20px_rgba(37,211,102,0.3)] flex items-center justify-center pointer-events-auto">Começar Teste Grátis</a>
+                </div>
+
+                <!-- Anual -->
+                <div class="glass-panel p-8 rounded-3xl border border-white/10 hover:border-[#25D366]/30 transition-all duration-300 relative group flex flex-col reveal-section delay-400">
+                    <h3 class="text-xl text-white font-medium mb-2">Anual</h3>
+                    <div class="flex items-baseline gap-1 mb-2">
+                        <span class="text-lg text-white/60">R$</span>
+                        <span class="text-4xl text-white font-bold tracking-tight">166</span>
+                        <span class="text-white/60">/mês</span>
+                    </div>
+                    <p class="text-xs text-white/40 font-mono mb-6 pb-6 border-b border-white/10">Faturado R$ 1.997 anualmente</p>
+                    
+                    <ul class="space-y-4 mb-8 flex-grow">
+                        <li class="flex items-start gap-3 text-sm text-white/80">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-[#25D366] text-lg flex-shrink-0 mt-0.5"></iconify-icon>
+                            <span>Tudo do plano semestral</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-sm text-white/80">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-[#25D366] text-lg flex-shrink-0 mt-0.5"></iconify-icon>
+                            <span>Episódio semanal (resumo 6-8min)</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-sm text-white/80">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-[#25D366] text-lg flex-shrink-0 mt-0.5"></iconify-icon>
+                            <span>Personalização Premium (abertura/fechamento)</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-sm text-white/80">
+                            <iconify-icon icon="solar:check-circle-bold" class="text-[#25D366] text-lg flex-shrink-0 mt-0.5"></iconify-icon>
+                            <span>Acesso antecipado a novos recursos</span>
+                        </li>
+                    </ul>
+                    <a href="https://pay.kirvano.com/d884edbf-6437-4fa2-b02f-a7123f98fc42" target="_blank" class="w-full py-4 rounded-xl bg-white/5 border border-white/10 text-white font-medium hover:bg-[#25D366] hover:text-stone-900 transition-colors duration-300 flex items-center justify-center pointer-events-auto">Começar Teste Grátis</a>
+                </div>
+            </div>
+
+            <!-- Footer Observações -->
+            <div class="mt-16 text-center max-w-3xl pointer-events-auto reveal-section delay-500">
+                <p class="text-xs text-white/60 mb-3 font-medium">Sem fidelidade. Cancele a renovação a qualquer momento.</p>
+                <p class="text-[10px] text-white/30 leading-relaxed">
+                    Direito de arrependimento de 7 dias com reembolso integral, conforme CDC. Após esse prazo, o cancelamento interrompe renovações futuras sem reembolso proporcional do período já contratado.
+                </p>
+            </div>
+        </div>
+
+        <!-- Fim do Scroll (Sem Spacer 4 para a página parar de rolar exatamente nos preços) -->
+
     </div>
 
-    <!-- Próxima seção fantasma apenas para permitir que o scroll passe da Hero suavemente -->
-    <div class="h-screen bg-white flex items-center justify-center relative z-30">
-        <div class="text-center">
-            <h2 class="text-3xl font-medium text-stone-900 mb-4">O conteúdo do site continuaria aqui.</h2>
-            <p class="text-stone-500">A seção hero destravou o pin.</p>
+    <!-- Floating WhatsApp Button -->
+    <a href="https://api.whatsapp.com/send/?phone=5511985254115&text=Olá%21+Gostaria+de+testar+o+NeoDaily.&type=phone_number&app_absent=0" target="_blank" class="fixed bottom-24 right-12 z-[999999] group flex items-center justify-center cursor-pointer">
+        <!-- Ping Animation Layer -->
+        <div class="absolute inset-0 bg-[#25D366] rounded-full animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite] opacity-75"></div>
+        <!-- Button Layer -->
+        <div class="relative w-16 h-16 bg-[#25D366] rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(37,211,102,0.5)] group-hover:scale-110 transition-transform duration-300">
+            <iconify-icon icon="mdi:whatsapp" class="text-white text-4xl"></iconify-icon>
         </div>
-    </div>
+    </a>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -242,6 +584,7 @@ CDNs Utilizados:
                 requestAnimationFrame(raf);
 
                 // Integração do Lenis com ScrollTrigger
+                window.lenis = lenis;
                 lenis.on('scroll', ScrollTrigger.update);
                 gsap.ticker.add((time) => { lenis.raf(time * 1000); });
                 gsap.ticker.lagSmoothing(0, 0);
@@ -278,11 +621,11 @@ CDNs Utilizados:
                 scrollTrigger: {
                     trigger: "#hero-scroll-container",
                     start: "top top",
-                    end: "+=150%", // Fades out completely when scrolled 150% of viewport
+                    end: () => "+=" + (window.innerHeight * 1.2), // Desaparece no primeiro 120vh de rolagem
                     scrub: true,
                 },
                 opacity: 0,
-                y: -150,
+                y: -100,
                 scale: 0.95,
                 ease: "none"
             });
@@ -298,9 +641,118 @@ CDNs Utilizados:
                 opacity: 0,
                 ease: "none"
             });
+            
+            // Parallax/Fade para a Segunda Dobra (some sincronizado com a chegada da Terceira)
+            gsap.to('#beneficios-text-wrapper', {
+                scrollTrigger: {
+                    trigger: "#hero-scroll-container",
+                    start: () => (window.innerHeight * 1.4) + "px top", // Começa a sumir assim que a 3a dobra aponta embaixo
+                    end: () => (window.innerHeight * 2.2) + "px top",   // Termina o fade suavemente junto com a transição do vídeo
+                    scrub: true,
+                },
+                opacity: 0,
+                y: -100, // Dá o efeito Parallax idêntico ao da Hero
+                scale: 0.95,
+                ease: "none"
+            });
 
             // ==========================================
-            // 4. Vídeo Scrubbing (Tag Native Video)
+            // 4. Animação de Transição: Hero -> Segunda Dobra
+            // ==========================================
+            const shiftTl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#hero-scroll-container",
+                    // Começa quando a tela já rolou 60vh (espaçador termina, 2a dobra começa a aparecer embaixo)
+                    start: () => (window.innerHeight * 0.6) + "px top", 
+                    // Termina quando rolou 140vh (2a dobra chega no meio da tela)
+                    end: () => (window.innerHeight * 1.4) + "px top",  
+                    scrub: true,
+                }
+            });
+            
+            // Empurra o vídeo pra esquerda (responsivo: vw)
+            shiftTl.to('#scrub-video', {
+                x: "-15vw", 
+                ease: "power1.inOut"
+            }, 0)
+            // Esconde overlay esquerdo e revela overlay direito simultaneamente
+            .to('#video-overlay-left', { opacity: 0, ease: "power1.inOut" }, 0)
+            .to('#video-overlay-right', { opacity: 1, ease: "power1.inOut" }, 0);
+
+            // ==========================================
+            // 5. Animação de Transição: Segunda Dobra -> Terceira Dobra
+            // ==========================================
+            const shiftRightTl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#hero-scroll-container",
+                    // Sincronizado perfeitamente com a subida da 3a dobra e fade-out da 2a dobra
+                    start: () => (window.innerHeight * 1.4) + "px top", 
+                    // Termina quando rolou 220vh (3a dobra chega no lugar)
+                    end: () => (window.innerHeight * 2.2) + "px top",  
+                    scrub: true,
+                }
+            });
+            
+            // Empurra o vídeo pra direita (deslocando do -15vw para +15vw)
+            shiftRightTl.to('#scrub-video', {
+                x: "15vw", 
+                ease: "power1.inOut"
+            }, 0)
+            // Esconde overlay direito e revela overlay esquerdo novamente para dar leitura
+            .to('#video-overlay-right', { opacity: 0, ease: "power1.inOut" }, 0)
+            .to('#video-overlay-left', { opacity: 1, ease: "power1.inOut" }, 0);
+
+            // GSAP Fade In da Terceira Dobra (espera a 2a dobra subir um pouco)
+            gsap.to('#comentarios-content', {
+                scrollTrigger: {
+                    trigger: "#hero-scroll-container",
+                    start: () => (window.innerHeight * 1.8) + "px top", // Começa mais tarde
+                    end: () => (window.innerHeight * 2.2) + "px top",  
+                    scrub: true,
+                },
+                autoAlpha: 1, // Toggles visibility e opacity
+                y: 0, // Vem do translate-y-8 para 0, criando efeito de "surgimento" gradual
+                ease: "none"
+            });
+
+            // Parallax/Fade OUT da Terceira Dobra (começa mais tarde para dar tempo de leitura)
+            gsap.to('#comentarios-text-wrapper', {
+                scrollTrigger: {
+                    trigger: "#hero-scroll-container",
+                    start: () => (window.innerHeight * 2.6) + "px top", // Dá 40vh de "pausa" para ler
+                    end: () => (window.innerHeight * 3.0) + "px top",
+                    scrub: true,
+                },
+                autoAlpha: 0, // Toggles visibility e opacity
+                y: -100, // Parallax de subida e sumiço
+                ease: "none"
+            });
+
+            // ==========================================
+            // 6. Animação de Transição: Terceira Dobra -> Quarta Dobra (Pricing)
+            // ==========================================
+            const pricingTl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#hero-scroll-container",
+                    start: () => (window.innerHeight * 2.6) + "px top", // Acompanha o sumiço da 3a dobra
+                    end: () => (window.innerHeight * 3.0) + "px top",  
+                    scrub: true,
+                }
+            });
+            
+            // Empurra o vídeo de volta pro centro e escurece
+            pricingTl.to('#scrub-video', {
+                x: "0vw",
+                scale: 1.1,
+                opacity: 0.15, // Fica como um background bem discreto para leitura do pricing
+                ease: "power1.inOut"
+            }, 0)
+            // Remove as máscaras de leitura laterais pois o texto agora é centralizado
+            .to('#video-overlay-left', { opacity: 0, ease: "power1.inOut" }, 0)
+            .to('#video-overlay-right', { opacity: 0, ease: "power1.inOut" }, 0);
+
+            // ==========================================
+            // 6. Vídeo Scrubbing (Tag Native Video)
             // ==========================================
             const video = document.getElementById('scrub-video');
             if(video && !prefersReducedMotion) {
@@ -325,6 +777,170 @@ CDNs Utilizados:
                     }
                 });
             }
+
+            // ==========================================
+            // 5. Intersection Observer para Revelar Elementos
+            // ==========================================
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15
+            };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.reveal-section').forEach(el => observer.observe(el));
+
+            // ==========================================
+            // 6. Audio Player Logic
+            // ==========================================
+            const audioEl = document.getElementById('podcast-audio');
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const playIcon = document.getElementById('play-icon');
+            const pauseIcon = document.getElementById('pause-icon');
+            const progressBar = document.getElementById('audio-progress');
+            const currentTimeEl = document.getElementById('current-time');
+            const totalTimeEl = document.getElementById('total-time');
+            const speedBtn = document.getElementById('speed-btn');
+
+            let isPlaying = false;
+            let currentSpeed = 1;
+
+            function formatTime(seconds) {
+                if(isNaN(seconds)) return "0:00";
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            }
+
+            audioEl.addEventListener('loadedmetadata', () => {
+                progressBar.max = audioEl.duration;
+                totalTimeEl.textContent = formatTime(audioEl.duration);
+            });
+
+            playPauseBtn.addEventListener('click', () => {
+                if (isPlaying) {
+                    audioEl.pause();
+                    playIcon.classList.remove('hidden');
+                    pauseIcon.classList.add('hidden');
+                } else {
+                    audioEl.play();
+                    playIcon.classList.add('hidden');
+                    pauseIcon.classList.remove('hidden');
+                }
+                isPlaying = !isPlaying;
+            });
+
+            audioEl.addEventListener('timeupdate', () => {
+                progressBar.value = audioEl.currentTime;
+                currentTimeEl.textContent = formatTime(audioEl.currentTime);
+                
+                // Update track background progress
+                const percentage = (audioEl.currentTime / audioEl.duration) * 100 || 0;
+                progressBar.style.background = `linear-gradient(to right, #25D366 ${percentage}%, rgba(255,255,255,0.2) ${percentage}%)`;
+            });
+
+            progressBar.addEventListener('input', () => {
+                audioEl.currentTime = progressBar.value;
+            });
+
+            audioEl.addEventListener('ended', () => {
+                isPlaying = false;
+                playIcon.classList.remove('hidden');
+                pauseIcon.classList.add('hidden');
+                progressBar.value = 0;
+                currentTimeEl.textContent = "0:00";
+                progressBar.style.background = `rgba(255,255,255,0.2)`;
+            });
+
+            speedBtn.addEventListener('click', () => {
+                if (currentSpeed === 1) {
+                    currentSpeed = 1.5;
+                } else if (currentSpeed === 1.5) {
+                    currentSpeed = 2;
+                } else {
+                    currentSpeed = 1;
+                }
+                audioEl.playbackRate = currentSpeed;
+                speedBtn.textContent = currentSpeed + 'x';
+            });
+
+            // ==========================================
+            // 7. Carousel de Comentários
+            // ==========================================
+            const track = document.getElementById('comments-track');
+            const prevBtn = document.getElementById('prev-comment');
+            const nextBtn = document.getElementById('next-comment');
+            const indicatorsContainer = document.getElementById('carousel-indicators');
+            
+            if (track) {
+                const slides = track.children;
+                const totalSlides = slides.length;
+                let currentIndex = 0;
+
+                // Create indicators
+                for (let i = 0; i < totalSlides; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = `w-2 h-2 rounded-full transition-all duration-300 cursor-pointer ${i === 0 ? 'bg-[#25D366] w-6 shadow-[0_0_10px_rgba(37,211,102,0.5)]' : 'bg-white/20 hover:bg-white/50'}`;
+                    dot.addEventListener('click', () => goToSlide(i));
+                    indicatorsContainer.appendChild(dot);
+                }
+                const dots = indicatorsContainer.children;
+
+                function updateCarousel() {
+                    // Mover track
+                    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                    // Atualizar dots
+                    Array.from(dots).forEach((dot, index) => {
+                        if (index === currentIndex) {
+                            dot.className = 'w-6 h-2 rounded-full bg-[#25D366] transition-all duration-300 cursor-pointer shadow-[0_0_10px_rgba(37,211,102,0.5)]';
+                        } else {
+                            dot.className = 'w-2 h-2 rounded-full bg-white/20 hover:bg-white/50 transition-all duration-300 cursor-pointer';
+                        }
+                    });
+
+                    // Atualizar imagens (Efeito 3D Focus/Coverflow)
+                    Array.from(slides).forEach((slide, index) => {
+                        const img = slide.querySelector('.slide-img');
+                        if (index === currentIndex) {
+                            // Imagem em destaque: Foco total, clara, grande
+                            img.style.transform = 'scale(1) rotateY(0deg)';
+                            img.style.opacity = '1';
+                            img.style.filter = 'blur(0px)';
+                        } else {
+                            // Imagens inativas: Menores, escuras, com blur e inclinadas para trás
+                            const direction = index < currentIndex ? -1 : 1;
+                            img.style.transform = `scale(0.85) rotateY(${direction * 15}deg)`;
+                            img.style.opacity = '0.3';
+                            img.style.filter = 'blur(4px)';
+                        }
+                    });
+                }
+
+                // Dispara a atualização inicial para o primeiro comentário já nascer com foco 100%
+                setTimeout(() => updateCarousel(), 50);
+
+                function goToSlide(index) {
+                    currentIndex = index;
+                    updateCarousel();
+                }
+
+                prevBtn.addEventListener('click', () => {
+                    currentIndex = (currentIndex > 0) ? currentIndex - 1 : totalSlides - 1;
+                    updateCarousel();
+                });
+
+                nextBtn.addEventListener('click', () => {
+                    currentIndex = (currentIndex < totalSlides - 1) ? currentIndex + 1 : 0;
+                    updateCarousel();
+                });
+            }
+
         });
     </script>
 </body>
