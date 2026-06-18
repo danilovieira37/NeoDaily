@@ -83,7 +83,7 @@ CDNs Utilizados:
         <div class="hero-sticky sticky top-0 w-full h-screen overflow-hidden flex flex-col justify-center bg-stone-900 grid-bg-dark">
 
             <!-- Tag de vídeo em FULLSCREEN -->
-            <video id="scrub-video" class="absolute inset-0 w-full h-full object-cover object-[15%_center] md:object-center md:scale-[1.25] md:translate-x-[12.5%] md:origin-[center_80%] z-0" muted playsinline autoplay preload="auto">
+            <video id="scrub-video" class="absolute inset-0 w-full h-full object-cover object-center md:scale-[1.25] md:translate-x-[12.5%] md:origin-[center_80%] z-0" muted playsinline autoplay preload="auto">
                 <source src="assets/videos/video.mp4" type="video/mp4">
             </video>
 
@@ -550,7 +550,7 @@ CDNs Utilizados:
             
             // Empurra o vídeo pra esquerda (responsivo: vw)
             shiftTl.to('#scrub-video', {
-                x: "-15vw", 
+                x: window.innerWidth < 768 ? "0vw" : "-15vw", 
                 ease: "power1.inOut"
             }, 0)
             // Esconde overlay esquerdo e revela overlay direito simultaneamente
@@ -573,7 +573,7 @@ CDNs Utilizados:
             
             // Empurra o vídeo pra direita (deslocando do -15vw para +15vw)
             shiftRightTl.to('#scrub-video', {
-                x: "15vw", 
+                x: window.innerWidth < 768 ? "0vw" : "15vw", 
                 ease: "power1.inOut"
             }, 0)
             // Esconde overlay direito e revela overlay esquerdo novamente para dar leitura
