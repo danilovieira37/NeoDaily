@@ -83,7 +83,7 @@ CDNs Utilizados:
         <div class="hero-sticky sticky top-0 w-full h-screen overflow-hidden flex flex-col justify-center bg-stone-900 grid-bg-dark">
 
             <!-- Tag de vídeo em FULLSCREEN -->
-            <video id="scrub-video" class="absolute inset-0 w-full h-full object-cover object-[15%_center] md:object-center md:scale-[1.25] md:translate-x-[12.5%] md:origin-[center_80%] z-0" muted playsinline preload="auto">
+            <video id="scrub-video" class="absolute inset-0 w-full h-full object-cover object-[15%_center] md:object-center md:scale-[1.25] md:translate-x-[12.5%] md:origin-[center_80%] z-0" muted playsinline autoplay preload="auto">
                 <source src="assets/videos/video.mp4" type="video/mp4">
             </video>
 
@@ -633,10 +633,17 @@ CDNs Utilizados:
             // 6. Vídeo Scrubbing (Tag Native Video)
             // ==========================================
             const video = document.getElementById('scrub-video');
+            if(video) {
+                // Force pause immediately in case autoplay triggered early
+                // The autoplay attribute is necessary for iOS Safari to load the video and first frame
+                video.pause();
+            }
+
             if(video && !prefersReducedMotion) {
                 // Garante que o vídeo vai conseguir reproduzir o currentTime rapidamente
                 video.addEventListener('loadedmetadata', function() {
                     video.pause();
+                    video.currentTime = 0;
                 });
                 
                 // Mapeia o progresso do scroll pro tempo do vídeo
