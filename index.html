@@ -9,7 +9,7 @@ INSTRUÇÕES DE SETUP (Abordagem A - Canvas + Sequência de Frames - PREFERIDA):
    Abra o terminal na pasta onde está o arquivo de vídeo e execute:
    
    mkdir -p assets/frames
-   ffmpeg -i "assets/raw_files/video.mp4" -vf "fps=30,scale=1920:-2" -q:v 4 assets/frames/frame_%04d.jpg
+   ffmpeg -i "assets/videos/video.mp4" -vf "fps=30,scale=1920:-2" -q:v 4 assets/frames/frame_%04d.jpg
 
 2. Verifique quantos frames foram gerados na pasta assets/frames.
    Vá até o final deste arquivo e ajuste a variável `frameCount` para o número exato de imagens.
@@ -67,136 +67,12 @@ CDNs Utilizados:
         }
     </script>
 
-    <style>
-        :root {
-            --bg-main: #FFFFFF;
-            --bg-alt: #F9F9F8;
-            --text-primary: #1C1C1C;
-            --text-secondary: #6B6B6B;
-            --stone-900: #1C1C1C;
-            --stone-200: #EAEAE5;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        /* Lenis smooth scroll fix */
-        html.lenis { height: auto; }
-        .lenis.lenis-smooth { scroll-behavior: auto; }
-        .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
-        .lenis.lenis-stopped { overflow: hidden; }
-        .lenis.lenis-scrolling iframe { pointer-events: none; }
-
-        /* Custom Micro-interactions & Design System Effects */
-        .glass-panel {
-            background: rgba(28, 28, 28, 0.4);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .beam-button {
-            position: relative;
-            overflow: hidden;
-        }
-        .beam-button::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(28, 28, 28, 0.15), transparent);
-            transition: left 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 1;
-        }
-        .beam-button:hover::before { left: 100%; }
-
-        .glow-on-hover { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .glow-on-hover:hover {
-            box-shadow: 0 10px 40px rgba(255, 255, 255, 0.15);
-            transform: translateY(-3px);
-        }
-
-        /* SplitType Line hiding for clean reveals */
-        .line { overflow: hidden; }
-        
-        /* Will-change para performance de animação */
-        .will-change-transform { will-change: transform, opacity; }
-        #video-canvas { will-change: transform; }
-        
-        /* Grid Background Dark */
-        .grid-bg-dark {
-            background-color: #0a0a0a;
-            background-size: 40px 40px;
-            background-image:
-                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-        }
-
-        /* Ocultar marca d'água do sistema (Gemini) se injetada no DOM */
-        [id*="gemini"], [class*="gemini"], [id*="watermark"], [class*="watermark"] {
-            display: none !important;
-            opacity: 0 !important;
-            visibility: hidden !important;
-            pointer-events: none !important;
-            z-index: -1 !important;
-        }
-
-        /* Scroll Reveal para seções */
-        .reveal-section {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .reveal-section.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .delay-200 { transition-delay: 0.2s; }
-        .delay-400 { transition-delay: 0.4s; }
-        
-        /* Custom Audio Range Slider */
-        .custom-range {
-            -webkit-appearance: none;
-            background: rgba(255, 255, 255, 0.2);
-        }
-        .custom-range:focus { outline: none; }
-        .custom-range::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 4px;
-            cursor: pointer;
-            border-radius: 9999px;
-            background: transparent;
-        }
-        .custom-range::-webkit-slider-thumb {
-            height: 14px;
-            width: 14px;
-            border-radius: 50%;
-            background: #25D366;
-            cursor: pointer;
-            -webkit-appearance: none;
-            margin-top: -5px;
-            box-shadow: 0 0 10px rgba(37, 211, 102, 0.5);
-            transition: transform 0.1s;
-        }
-        .custom-range::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-        }
-
-        /* Fallback de motion */
-        @media (prefers-reduced-motion: reduce) {
-            .scroll-indicator { display: none; }
-            .beam-button::before { display: none; }
-            * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; scroll-behavior: auto !important; }
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body class="selection:bg-white selection:text-stone-900 bg-stone-900 text-white">
+
+    <!-- Premium Noise Texture Overlay -->
+    <div class="noise-bg"></div>
 
     <!-- HERO SECTION - PINNED CONTAINER -->
     <!-- Define a altura do scroll. 400vh significa 4x a altura da tela para o tempo de scrub total do vídeo -->
@@ -208,7 +84,7 @@ CDNs Utilizados:
 
             <!-- Tag de vídeo em FULLSCREEN -->
             <video id="scrub-video" class="absolute inset-0 w-full h-full object-cover object-[15%_center] md:object-center md:scale-[1.25] md:translate-x-[12.5%] md:origin-[center_80%] z-0" muted playsinline preload="auto">
-                <source src="assets/raw_files/video.mp4" type="video/mp4">
+                <source src="assets/videos/video.mp4" type="video/mp4">
             </video>
 
             <!-- Overlay da Hero (Escuro na esquerda) -->
@@ -276,22 +152,22 @@ CDNs Utilizados:
                         <div class="relative rounded-[2rem] p-3 bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-tr before:from-[#25D366]/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-700 perspective-[1000px]">
                             <div id="comments-track" class="flex transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] relative z-10">
                                 <div class="w-full flex-shrink-0 px-2 flex items-center justify-center">
-                                    <img src="assets/raw_files/comentario01.png" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
+                                    <img src="assets/images/comentario01.png" alt="Comentário 1 - Prova social" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
                                 </div>
                                 <div class="w-full flex-shrink-0 px-2 flex items-center justify-center">
-                                    <img src="assets/raw_files/comentario02.png" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
+                                    <img src="assets/images/comentario02.png" alt="Comentário 2 - Prova social" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
                                 </div>
                                 <div class="w-full flex-shrink-0 px-2 flex items-center justify-center">
-                                    <img src="assets/raw_files/comentario03.png" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
+                                    <img src="assets/images/comentario03.png" alt="Comentário 3 - Prova social" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
                                 </div>
                                 <div class="w-full flex-shrink-0 px-2 flex items-center justify-center">
-                                    <img src="assets/raw_files/comentario04.png" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
+                                    <img src="assets/images/comentario04.png" alt="Comentário 4 - Prova social" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
                                 </div>
                                 <div class="w-full flex-shrink-0 px-2 flex items-center justify-center">
-                                    <img src="assets/raw_files/comentario05.png" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
+                                    <img src="assets/images/comentario05.png" alt="Comentário 5 - Prova social" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
                                 </div>
                                 <div class="w-full flex-shrink-0 px-2 flex items-center justify-center">
-                                    <img src="assets/raw_files/comentario06.png" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
+                                    <img src="assets/images/comentario06.png" alt="Comentário 6 - Prova social" class="slide-img w-full max-w-[280px] rounded-2xl shadow-lg border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform scale-75 opacity-0 blur-sm">
                                 </div>
                             </div>
                         </div>
@@ -348,7 +224,7 @@ CDNs Utilizados:
                         <div class="absolute inset-0 bg-gradient-to-r from-[#25D366]/10 to-transparent opacity-50"></div>
                         
                         <!-- Audio Element -->
-                        <audio id="podcast-audio" src="assets/raw_files/neodaily_exemplo_podcast.mp3" preload="metadata"></audio>
+                        <audio id="podcast-audio" src="assets/audio/neodaily_exemplo_podcast.mp3" preload="metadata"></audio>
 
                         <!-- Play/Pause Button -->
                         <button id="play-pause-btn" class="relative z-10 w-12 h-12 flex-shrink-0 rounded-full bg-[#25D366] text-stone-900 flex items-center justify-center shadow-[0_0_20px_rgba(37,211,102,0.3)] hover:scale-105 hover:shadow-[0_0_30px_rgba(37,211,102,0.5)] transition-all duration-300 cursor-pointer">
@@ -418,6 +294,8 @@ CDNs Utilizados:
 
         <!-- 4a DOBRA: Preços (Centro) -->
         <div id="pricing-content" class="relative z-30 w-full max-w-[1400px] mx-auto px-6 flex flex-col items-center justify-start pt-16 pointer-events-none min-h-screen">
+            <!-- Ambient Glow Behind Pricing -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#25D366] rounded-full blur-[180px] opacity-[0.03] pointer-events-none z-[-1]"></div>
             <!-- Título Pricing -->
             <div class="mb-12 reveal-section text-center pointer-events-auto">
                 <span class="inline-block py-1.5 px-4 rounded-full bg-[#25D366]/10 border border-[#25D366]/20 text-[#25D366] text-xs font-mono uppercase tracking-widest mb-6">
@@ -435,7 +313,7 @@ CDNs Utilizados:
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl pointer-events-auto">
                 
                 <!-- Trimestral -->
-                <div class="glass-panel p-8 rounded-3xl border border-white/10 hover:border-[#25D366]/30 transition-all duration-300 relative group flex flex-col reveal-section delay-200">
+                <div class="glass-panel p-8 rounded-3xl border border-white/10 hover:border-[#25D366]/30 transition-all duration-300 relative group flex flex-col reveal-section delay-200 animate-float">
                     <h3 class="text-xl text-white font-medium mb-2">Trimestral</h3>
                     <div class="flex items-baseline gap-1 mb-2">
                         <span class="text-lg text-white/60">R$</span>
@@ -466,7 +344,7 @@ CDNs Utilizados:
                 </div>
 
                 <!-- Semestral -->
-                <div class="glass-panel p-8 rounded-3xl border border-[#25D366]/50 shadow-[0_0_40px_rgba(37,211,102,0.15)] relative group flex flex-col reveal-section delay-300 transform md:-translate-y-4">
+                <div class="glass-panel p-8 rounded-3xl border border-[#25D366]/50 shadow-[0_0_40px_rgba(37,211,102,0.15)] relative group flex flex-col reveal-section delay-300 transform md:-translate-y-4 animate-pulse-glow">
                     <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#25D366] text-stone-900 text-[10px] font-bold uppercase tracking-widest py-1.5 px-4 rounded-full">
                         Mais Popular
                     </div>
@@ -500,7 +378,7 @@ CDNs Utilizados:
                 </div>
 
                 <!-- Anual -->
-                <div class="glass-panel p-8 rounded-3xl border border-white/10 hover:border-[#25D366]/30 transition-all duration-300 relative group flex flex-col reveal-section delay-400">
+                <div class="glass-panel p-8 rounded-3xl border border-white/10 hover:border-[#25D366]/30 transition-all duration-300 relative group flex flex-col reveal-section delay-400 animate-float-delayed">
                     <h3 class="text-xl text-white font-medium mb-2">Anual</h3>
                     <div class="flex items-baseline gap-1 mb-2">
                         <span class="text-lg text-white/60">R$</span>
