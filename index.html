@@ -69,7 +69,7 @@ CDNs Utilizados:
 
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body class="selection:bg-white selection:text-stone-900 bg-stone-900 text-white">
+<body class="selection:bg-white selection:text-stone-900 bg-stone-900 text-white overflow-x-hidden">
 
     <!-- Premium Noise Texture Overlay -->
     <div class="noise-bg"></div>
@@ -103,7 +103,7 @@ CDNs Utilizados:
                     </div>
 
                     <!-- Headline -->
-                    <h1 class="headline text-4xl md:text-6xl lg:text-[5.5rem] font-semibold tracking-tighter leading-[1.05] text-white mb-6 max-w-4xl">
+                    <h1 class="headline text-[2rem] md:text-6xl lg:text-[5.5rem] font-semibold tracking-tighter leading-tight text-white mb-6 max-w-4xl">
                         <span class="text-[#25D366]">Crie o seu próprio podcast</span><br/>
                         <span class="text-white">e revolucione seus grupos.</span>
                     </h1>
@@ -173,11 +173,11 @@ CDNs Utilizados:
                         </div>
 
                         <!-- Navigation Controls -->
-                        <button id="prev-comment" class="absolute -left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-stone-900 border border-white/10 flex items-center justify-center text-white shadow-xl hover:bg-[#25D366] hover:text-stone-900 hover:scale-110 hover:border-[#25D366] transition-all duration-300 z-20 pointer-events-auto">
-                            <iconify-icon icon="solar:alt-arrow-left-linear" class="text-2xl"></iconify-icon>
+                        <button id="prev-comment" class="absolute left-0 md:-left-6 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-stone-900 border border-white/10 flex items-center justify-center text-white shadow-xl hover:bg-[#25D366] hover:text-stone-900 hover:scale-110 hover:border-[#25D366] transition-all duration-300 z-20 pointer-events-auto">
+                            <iconify-icon icon="solar:alt-arrow-left-linear" class="text-xl md:text-2xl"></iconify-icon>
                         </button>
-                        <button id="next-comment" class="absolute -right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-stone-900 border border-white/10 flex items-center justify-center text-white shadow-xl hover:bg-[#25D366] hover:text-stone-900 hover:scale-110 hover:border-[#25D366] transition-all duration-300 z-20 pointer-events-auto">
-                            <iconify-icon icon="solar:alt-arrow-right-linear" class="text-2xl"></iconify-icon>
+                        <button id="next-comment" class="absolute right-0 md:-right-6 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-stone-900 border border-white/10 flex items-center justify-center text-white shadow-xl hover:bg-[#25D366] hover:text-stone-900 hover:scale-110 hover:border-[#25D366] transition-all duration-300 z-20 pointer-events-auto">
+                            <iconify-icon icon="solar:alt-arrow-right-linear" class="text-xl md:text-2xl"></iconify-icon>
                         </button>
 
                         <div id="carousel-indicators" class="flex justify-center gap-2 mt-6 pointer-events-auto"></div>
@@ -446,7 +446,7 @@ CDNs Utilizados:
                 scrollTrigger: {
                     trigger: "#hero-scroll-container",
                     start: "top top",
-                    end: () => "+=" + (window.innerHeight * 1.2), // Desaparece no primeiro 120vh de rolagem
+                    end: () => "+=" + (window.innerHeight * (window.innerWidth < 768 ? 1.5 : 1.2)), // Desaparece mais devagar no mobile
                     scrub: true,
                 },
                 opacity: 0,
@@ -471,8 +471,8 @@ CDNs Utilizados:
             gsap.to('#beneficios-text-wrapper', {
                 scrollTrigger: {
                     trigger: "#hero-scroll-container",
-                    start: () => (window.innerHeight * 1.4) + "px top", // Começa a sumir assim que a 3a dobra aponta embaixo
-                    end: () => (window.innerHeight * 2.2) + "px top",   // Termina o fade suavemente junto com a transição do vídeo
+                    start: () => (window.innerHeight * (window.innerWidth < 768 ? 1.6 : 1.4)) + "px top", 
+                    end: () => (window.innerHeight * (window.innerWidth < 768 ? 2.4 : 2.2)) + "px top",   
                     scrub: true,
                 },
                 opacity: 0,
@@ -488,9 +488,9 @@ CDNs Utilizados:
                 scrollTrigger: {
                     trigger: "#hero-scroll-container",
                     // Começa quando a tela já rolou 60vh (espaçador termina, 2a dobra começa a aparecer embaixo)
-                    start: () => (window.innerHeight * 0.6) + "px top", 
+                    start: () => (window.innerHeight * (window.innerWidth < 768 ? 0.8 : 0.6)) + "px top", 
                     // Termina quando rolou 140vh (2a dobra chega no meio da tela)
-                    end: () => (window.innerHeight * 1.4) + "px top",  
+                    end: () => (window.innerHeight * (window.innerWidth < 768 ? 1.6 : 1.4)) + "px top",  
                     scrub: true,
                 }
             });
@@ -511,9 +511,9 @@ CDNs Utilizados:
                 scrollTrigger: {
                     trigger: "#hero-scroll-container",
                     // Sincronizado perfeitamente com a subida da 3a dobra e fade-out da 2a dobra
-                    start: () => (window.innerHeight * 1.4) + "px top", 
+                    start: () => (window.innerHeight * (window.innerWidth < 768 ? 1.6 : 1.4)) + "px top", 
                     // Termina quando rolou 220vh (3a dobra chega no lugar)
-                    end: () => (window.innerHeight * 2.2) + "px top",  
+                    end: () => (window.innerHeight * (window.innerWidth < 768 ? 2.4 : 2.2)) + "px top",  
                     scrub: true,
                 }
             });
@@ -531,8 +531,8 @@ CDNs Utilizados:
             gsap.to('#comentarios-content', {
                 scrollTrigger: {
                     trigger: "#hero-scroll-container",
-                    start: () => (window.innerHeight * 1.8) + "px top", // Começa mais tarde
-                    end: () => (window.innerHeight * 2.2) + "px top",  
+                    start: () => (window.innerHeight * (window.innerWidth < 768 ? 2.0 : 1.8)) + "px top", // Começa mais tarde
+                    end: () => (window.innerHeight * (window.innerWidth < 768 ? 2.4 : 2.2)) + "px top",  
                     scrub: true,
                 },
                 autoAlpha: 1, // Toggles visibility e opacity
@@ -544,8 +544,8 @@ CDNs Utilizados:
             gsap.to('#comentarios-text-wrapper', {
                 scrollTrigger: {
                     trigger: "#hero-scroll-container",
-                    start: () => (window.innerHeight * 2.6) + "px top", // Dá 40vh de "pausa" para ler
-                    end: () => (window.innerHeight * 3.0) + "px top",
+                    start: () => (window.innerHeight * (window.innerWidth < 768 ? 2.8 : 2.6)) + "px top", // Dá 40vh de "pausa" para ler
+                    end: () => (window.innerHeight * (window.innerWidth < 768 ? 3.2 : 3.0)) + "px top",
                     scrub: true,
                 },
                 autoAlpha: 0, // Toggles visibility e opacity
@@ -559,8 +559,8 @@ CDNs Utilizados:
             const pricingTl = gsap.timeline({
                 scrollTrigger: {
                     trigger: "#hero-scroll-container",
-                    start: () => (window.innerHeight * 2.6) + "px top", // Acompanha o sumiço da 3a dobra
-                    end: () => (window.innerHeight * 3.0) + "px top",  
+                    start: () => (window.innerHeight * (window.innerWidth < 768 ? 2.8 : 2.6)) + "px top", // Acompanha o sumiço da 3a dobra
+                    end: () => (window.innerHeight * (window.innerWidth < 768 ? 3.2 : 3.0)) + "px top",  
                     scrub: true,
                 }
             });
