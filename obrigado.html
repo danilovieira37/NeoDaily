@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compra Aprovada - Obrigado!</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- CDNs -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://unpkg.com/split-type"></script>
+
+    <script>
+        // Tailwind Configuration - Matching Design System Tokens
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        stone: {
+                            200: '#EAEAE5',
+                            300: '#C2C2C2',
+                            400: '#999999',
+                            500: '#6B6B6B',
+                            900: '#1C1C1C'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        'pulse-glow': {
+                            '0%, 100%': { opacity: 1 },
+                            '50%': { opacity: .5 },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="selection:bg-white selection:text-stone-900 bg-stone-900 text-white min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+
+    <!-- Background Image (Logo) -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
+        <img src="assets/images/logo_neodaily.png" alt="Logo NeoDaily Background" class="w-full h-full object-cover object-center opacity-[0.04] invert mix-blend-screen grayscale">
+    </div>
+
+    <!-- Premium Noise Texture Overlay -->
+    <div class="noise-bg relative z-0"></div>
+
+    <!-- Ambient Glows -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-[#25D366] rounded-full blur-[100px] md:blur-[180px] opacity-[0.05] pointer-events-none z-0"></div>
+    <div class="absolute top-0 right-0 w-[400px] h-[400px] bg-[#25D366] rounded-full blur-[150px] opacity-[0.03] pointer-events-none z-0"></div>
+
+    <!-- Content -->
+    <main class="relative z-10 w-full max-w-4xl mx-auto px-6 py-10 flex flex-col items-center text-center">
+        
+        <!-- Success Icon -->
+        <div class="icon-reveal mb-5 opacity-0 scale-50 relative">
+            <div class="absolute inset-0 bg-[#25D366] blur-2xl opacity-20 rounded-full animate-pulse-glow"></div>
+            <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#25D366]/10 border border-[#25D366]/30 flex items-center justify-center relative z-10 backdrop-blur-sm">
+                <iconify-icon icon="solar:check-circle-bold-duotone" class="text-4xl md:text-5xl text-[#25D366] drop-shadow-[0_0_15px_rgba(37,211,102,0.5)]"></iconify-icon>
+            </div>
+        </div>
+
+        <!-- Badge -->
+        <div class="badge-reveal inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel text-[10px] md:text-xs font-mono uppercase tracking-widest text-stone-200 mb-4 opacity-0 translate-y-4">
+            <span class="w-2 h-2 rounded-full bg-[#25D366] animate-pulse"></span>
+            Pagamento Aprovado
+        </div>
+
+        <!-- Headline -->
+        <h1 class="headline text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tighter leading-[1.05] text-white mb-4 max-w-3xl">
+            Bem-vindo(a) ao<br/>
+            <span class="text-[#25D366]">Seu NeoDaily.</span>
+        </h1>
+        
+        <!-- Subheadline -->
+        <p class="subheadline text-sm md:text-base text-white/80 max-w-2xl leading-relaxed mb-8 opacity-0">
+            Agradecemos imensamente pela sua compra. Todo o material do curso já está sendo preparado e as instruções de acesso foram enviadas para o seu e-mail.
+        </p>
+
+        <!-- Next Steps Cards -->
+        <div class="steps-wrapper grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl mb-8 opacity-0">
+            
+            <div class="glass-panel p-5 rounded-2xl border border-white/5 hover:border-[#25D366]/30 transition-all duration-300 relative group text-left animate-float" style="animation-delay: 0s;">
+                <iconify-icon icon="solar:letter-bold-duotone" class="text-2xl text-stone-400 group-hover:text-[#25D366] transition-colors mb-3"></iconify-icon>
+                <h3 class="text-base font-medium text-white mb-1">1. Cheque seu E-mail</h3>
+                <p class="text-xs text-white/60 leading-relaxed">Você receberá seus dados de acesso (login e senha) na sua caixa de entrada em instantes.</p>
+            </div>
+
+            <div class="glass-panel p-5 rounded-2xl border border-white/5 hover:border-[#25D366]/30 transition-all duration-300 relative group text-left animate-float" style="animation-delay: 1s;">
+                <iconify-icon icon="solar:monitor-smartphone-bold-duotone" class="text-2xl text-stone-400 group-hover:text-[#25D366] transition-colors mb-3"></iconify-icon>
+                <h3 class="text-base font-medium text-white mb-1">2. Acesse a Plataforma</h3>
+                <p class="text-xs text-white/60 leading-relaxed">Faça login com os dados recebidos para acessar todo o conteúdo exclusivo do curso.</p>
+            </div>
+
+            <div class="glass-panel p-5 rounded-2xl border border-white/5 hover:border-[#25D366]/30 transition-all duration-300 relative group text-left animate-float" style="animation-delay: 2s;">
+                <iconify-icon icon="solar:users-group-two-rounded-bold-duotone" class="text-2xl text-stone-400 group-hover:text-[#25D366] transition-colors mb-3"></iconify-icon>
+                <h3 class="text-base font-medium text-white mb-1">3. Junte-se ao Grupo</h3>
+                <p class="text-xs text-white/60 leading-relaxed">Entre em nossa comunidade exclusiva de alunos e comece a interagir agora mesmo.</p>
+            </div>
+
+        </div>
+
+        <!-- CTAs -->
+        <div class="cta-wrapper flex flex-col sm:flex-row items-center justify-center gap-4 opacity-0 w-full">
+            <a href="#" class="beam-button px-6 py-3 bg-[#25D366] text-stone-900 rounded-full text-sm font-bold flex items-center justify-center gap-3 hover:bg-[#1ebd5a] transition-colors shadow-[0_0_20px_rgba(37,211,102,0.3)] w-full sm:w-auto hover:scale-105 duration-300">
+                Acessar Área de Membros
+                <iconify-icon icon="solar:login-2-bold-duotone" class="text-xl"></iconify-icon>
+            </a>
+            <a href="https://api.whatsapp.com/send/?phone=5511985254115&text=Ol%C3%A1%21+Acabei+de+comprar+o+curso+e+preciso+de+ajuda." target="_blank" class="px-6 py-3 bg-transparent border border-white/20 text-white rounded-full text-sm font-medium hover:bg-white/10 transition-colors duration-300 flex items-center justify-center gap-2 glass-panel w-full sm:w-auto">
+                Preciso de ajuda
+                <iconify-icon icon="mdi:whatsapp" class="text-xl"></iconify-icon>
+            </a>
+        </div>
+
+    </main>
+
+    <!-- Support Footer -->
+    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-center w-full z-10 footer-reveal opacity-0">
+        <p class="text-[10px] font-mono text-stone-500 uppercase tracking-widest">
+            Se não encontrar o e-mail, verifique a caixa de spam ou promoções.
+        </p>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Animação de Entrada
+            const splitHeadline = new SplitType('.headline', { types: 'lines, words' });
+            
+            const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+
+            // Icon pops in
+            tl.to('.icon-reveal', { opacity: 1, scale: 1, duration: 1, ease: "back.out(1.7)", delay: 0.2 })
+            // Badge fade in
+            .to('.badge-reveal', { opacity: 1, y: 0, duration: 0.8 }, "-=0.6")
+            // Words staggared reveal
+            .from(splitHeadline.words, {
+                y: "120%",
+                opacity: 0,
+                duration: 1.2,
+                stagger: 0.04,
+                ease: "expo.out"
+            }, "-=0.6")
+            // Subheadline fade in
+            .to('.subheadline', { opacity: 1, y: 0, duration: 1 }, "-=0.8")
+            // Steps stagger in
+            .to('.steps-wrapper', { opacity: 1, y: 0, duration: 1 }, "-=0.6")
+            // CTA Buttons
+            .to('.cta-wrapper', { opacity: 1, y: 0, duration: 1 }, "-=0.8")
+            // Footer text
+            .to('.footer-reveal', { opacity: 1, duration: 1 }, "-=0.5");
+        });
+    </script>
+</body>
+</html>
